@@ -31,6 +31,34 @@
 		A1000114 /* tundra.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000114 /* tundra.c */; };
 		A1000115 /* xbin.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000115 /* xbin.c */; };
 		A1000116 /* reallocarray.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000116 /* reallocarray.c */; };
+		B1000001 /* RendererTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000001 /* RendererTests.swift */; };
+		B1000002 /* PackFetcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000002 /* PackFetcherTests.swift */; };
+		B1000003 /* CacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000003 /* CacheTests.swift */; };
+		B1000004 /* ConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000004 /* ConfigurationTests.swift */; };
+		B1100001 /* AnsiSaverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* AnsiSaverView.swift */; };
+		B1100002 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* Renderer.swift */; };
+		B1100003 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* Configuration.swift */; };
+		B1100004 /* Cache.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000004 /* Cache.swift */; };
+		B1100005 /* ArtSource.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000005 /* ArtSource.swift */; };
+		B1100006 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* Animator.swift */; };
+		B1100007 /* PackFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* PackFetcher.swift */; };
+		B1100008 /* ConfigSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* ConfigSheet.swift */; };
+		B1100101 /* clean.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000101 /* clean.c */; };
+		B1100102 /* drawchar.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000102 /* drawchar.c */; };
+		B1100103 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000103 /* error.c */; };
+		B1100104 /* fonts.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000104 /* fonts.c */; };
+		B1100105 /* init.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000105 /* init.c */; };
+		B1100106 /* loadfile.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000106 /* loadfile.c */; };
+		B1100107 /* output.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000107 /* output.c */; };
+		B1100108 /* savefile.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000108 /* savefile.c */; };
+		B1100109 /* ansi.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000109 /* ansi.c */; };
+		B1100110 /* artworx.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000110 /* artworx.c */; };
+		B1100111 /* binary.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000111 /* binary.c */; };
+		B1100112 /* icedraw.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000112 /* icedraw.c */; };
+		B1100113 /* pcboard.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000113 /* pcboard.c */; };
+		B1100114 /* tundra.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000114 /* tundra.c */; };
+		B1100115 /* xbin.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000115 /* xbin.c */; };
+		B1100116 /* reallocarray.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000116 /* reallocarray.c */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -69,10 +97,23 @@
 		A2000124 /* reallocarray.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = reallocarray.h; sourceTree = "<group>"; };
 		A2000125 /* strtonum.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = strtonum.h; sourceTree = "<group>"; };
 		A2000126 /* strndup.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = strndup.h; sourceTree = "<group>"; };
+		B2000001 /* RendererTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RendererTests.swift; sourceTree = "<group>"; };
+		B2000002 /* PackFetcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackFetcherTests.swift; sourceTree = "<group>"; };
+		B2000003 /* CacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheTests.swift; sourceTree = "<group>"; };
+		B2000004 /* ConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationTests.swift; sourceTree = "<group>"; };
+		B2000005 /* sample.ans */ = {isa = PBXFileReference; lastKnownFileType = file; path = sample.ans; sourceTree = "<group>"; };
+		B2000010 /* AnsiSaverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnsiSaverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
 		A3000001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B3000001 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -86,6 +127,7 @@
 			isa = PBXGroup;
 			children = (
 				A4000002 /* Sources */,
+				B4000001 /* Tests */,
 				A4000004 /* vendor */,
 				A2000012 /* AnsiSaver-Bridging-Header.h */,
 				A2000011 /* Info.plist */,
@@ -114,6 +156,34 @@
 				A2000008 /* ConfigSheet.swift */,
 			);
 			path = AnsiSaver;
+			sourceTree = "<group>";
+		};
+		B4000001 /* Tests */ = {
+			isa = PBXGroup;
+			children = (
+				B4000002 /* AnsiSaverTests */,
+			);
+			path = Tests;
+			sourceTree = "<group>";
+		};
+		B4000002 /* AnsiSaverTests */ = {
+			isa = PBXGroup;
+			children = (
+				B2000001 /* RendererTests.swift */,
+				B2000002 /* PackFetcherTests.swift */,
+				B2000003 /* CacheTests.swift */,
+				B2000004 /* ConfigurationTests.swift */,
+				B4000003 /* Fixtures */,
+			);
+			path = AnsiSaverTests;
+			sourceTree = "<group>";
+		};
+		B4000003 /* Fixtures */ = {
+			isa = PBXGroup;
+			children = (
+				B2000005 /* sample.ans */,
+			);
+			path = Fixtures;
 			sourceTree = "<group>";
 		};
 		A4000004 /* vendor */ = {
@@ -191,6 +261,7 @@
 			isa = PBXGroup;
 			children = (
 				A2000010 /* AnsiSaver.saver */,
+				B2000010 /* AnsiSaverTests.xctest */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -215,6 +286,22 @@
 			productReference = A2000010 /* AnsiSaver.saver */;
 			productType = "com.apple.product-type.bundle";
 		};
+		B5000001 /* AnsiSaverTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = B7000003 /* Build configuration list for PBXNativeTarget "AnsiSaverTests" */;
+			buildPhases = (
+				B6000001 /* Sources */,
+				B3000001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = AnsiSaverTests;
+			productName = AnsiSaverTests;
+			productReference = B2000010 /* AnsiSaverTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 /* End PBXNativeTarget section */
 
 /* Begin PBXProject section */
@@ -238,6 +325,7 @@
 			projectRoot = "";
 			targets = (
 				A5000001 /* AnsiSaver */,
+				B5000001 /* AnsiSaverTests */,
 			);
 		};
 /* End PBXProject section */
@@ -281,6 +369,41 @@
 				A1000114 /* tundra.c in Sources */,
 				A1000115 /* xbin.c in Sources */,
 				A1000116 /* reallocarray.c in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		B6000001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				B1000001 /* RendererTests.swift in Sources */,
+				B1000002 /* PackFetcherTests.swift in Sources */,
+				B1000003 /* CacheTests.swift in Sources */,
+				B1000004 /* ConfigurationTests.swift in Sources */,
+				B1100001 /* AnsiSaverView.swift in Sources */,
+				B1100002 /* Renderer.swift in Sources */,
+				B1100003 /* Configuration.swift in Sources */,
+				B1100004 /* Cache.swift in Sources */,
+				B1100005 /* ArtSource.swift in Sources */,
+				B1100006 /* Animator.swift in Sources */,
+				B1100007 /* PackFetcher.swift in Sources */,
+				B1100008 /* ConfigSheet.swift in Sources */,
+				B1100101 /* clean.c in Sources */,
+				B1100102 /* drawchar.c in Sources */,
+				B1100103 /* error.c in Sources */,
+				B1100104 /* fonts.c in Sources */,
+				B1100105 /* init.c in Sources */,
+				B1100106 /* loadfile.c in Sources */,
+				B1100107 /* output.c in Sources */,
+				B1100108 /* savefile.c in Sources */,
+				B1100109 /* ansi.c in Sources */,
+				B1100110 /* artworx.c in Sources */,
+				B1100111 /* binary.c in Sources */,
+				B1100112 /* icedraw.c in Sources */,
+				B1100113 /* pcboard.c in Sources */,
+				B1100114 /* tundra.c in Sources */,
+				B1100115 /* xbin.c in Sources */,
+				B1100116 /* reallocarray.c in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -478,6 +601,34 @@
 			};
 			name = Release;
 		};
+		B7000021 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lardissone.AnsiSaverTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "AnsiSaver-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		B7000022 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = YES;
+				PRODUCT_BUNDLE_IDENTIFIER = com.lardissone.AnsiSaverTests;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_EMIT_LOC_STRINGS = NO;
+				SWIFT_OBJC_BRIDGING_HEADER = "AnsiSaver-Bridging-Header.h";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
@@ -495,6 +646,15 @@
 			buildConfigurations = (
 				A7000021 /* Debug */,
 				A7000022 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		B7000003 /* Build configuration list for PBXNativeTarget "AnsiSaverTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				B7000021 /* Debug */,
+				B7000022 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;

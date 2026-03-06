@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="ISO-8859-1">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="16colo.rs is an archive of ANSI and ASCII art. Preserving artpacks released through the BBS underground artscene since the early 1990s until the present."/>
+  <meta property="og:description" content="16colo.rs is an archive of ANSI and ASCII art. Preserving artpacks released through the BBS underground artscene since the early 1990s until the present."/>
+  <title>16colo.rs</title>
+  <meta property="og:title" content="16colo.rs"/>
+  <meta property="og:logo" content="/img/16c-logo-square.png" size="512x512" />
+  <link rel="stylesheet" href="/css/16colors.css?v=22040701">
+    <link rel="shortcut icon" href="/favicon.ico">
+  <link rel="manifest" href="/manifest.json">
+  <link rel="preload" href="/static/blockzone-webfont.woff2" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="/fonts/ionicons.woff2?v=4.2.1" as="font" type="font/woff2" crossorigin>
+  <meta name="theme-color" content="#555555">
+  <meta name="msapplication-navbutton-color" content="#555555">
+  <meta name="apple-mobile-web-app-status-bar-style" content="#55555">
+<!-- Hotjar Tracking Code for 16colo.rs -->
+<!--
+<script>
+    (function(h,o,t,j,a,r){
+        h.hj=h.hj||function(){(h.hj.q=h.hj.q||[]).push(arguments)};
+        h._hjSettings={hjid:1216417,hjsv:6};
+        a=o.getElementsByTagName('head')[0];
+        r=o.createElement('script');r.async=1;
+        r.src=t+h._hjSettings.hjid+j+h._hjSettings.hjsv;
+        a.appendChild(r);
+    })(window,document,'https://static.hotjar.com/c/hotjar-','.js?sv=');
+</script>
+-->
+</head>
+<body bgcolor="#555555">
+<header>
+    <nav id="mainnav" class="navbar is-fixed-top" role="navigation" aria-label="main navigation">
+      <div class="navbar-brand is-hidden-desktop">
+        <a href="https://16colo.rs/" aria-label="16colo.rs"><img src="/16c.svg" class="bclogo" width="82" height="28" alt="16colo.rs"></a>
+        <div id="navbar-burger-id" class="navbar-burger">█▓▒░  </div>
+      </div>
+      <div id="navbar-menu-id" class="navbar-menu is-hidden-desktop">
+        <div class="navbar-start">
+          <a class="navbar-item">BROWSE</a>
+          <div class="navbar-dropdown has-dropdown">
+            <a class="navbar-item" href="https://16colo.rs/year/1996/">PACKS</a>
+            <a class="navbar-item" href="https://16colo.rs/mags/1996/">E-MAGS</a>
+            <a class="navbar-item" href="https://16colo.rs/artist/">ARTISTS</a>
+            <a class="navbar-item" href="https://16colo.rs/group/">GROUPS</a>
+          </div>
+          <a class="navbar-item" href="/search/">SEARCH</a>
+          <a class="navbar-item" href="/tags/">TAGS</a>
+          <a class="navbar-item" href="/upload/">UPLOAD</a>
+          <a class="navbar-item" href="/faq/">FAQ</a>
+          <a class="navbar-item" href="https://forum.16colo.rs/">FORUM</a>
+                    <a class="navbar-item" href="/login/">LOGIN</a>
+                  </div>
+      </div>
+      <div class="navbar-menu is-hidden-touch">
+        <div class="navbar-start">
+          <a href="https://16colo.rs/"><img src="/16c.svg" class="bclogo" width="82" height="28" alt="16colo.rs"></a>
+        </div>
+        <div class="navbar-end">
+          <div class="dropdown is-center is-hoverable" style="">
+            <div class="dropdown-trigger">
+              <a class="navbar-item" href="/">BROWSE</a>
+              <div class="dropdown-menu" role="menu">
+                <div class="dropdown-content">
+                  <a class="dropdown-item" href="https://16colo.rs/year/1996/">PACKS</a>
+                  <a class="dropdown-item" href="https://16colo.rs/mags/1996/">E-MAGS</a>
+                  <a class="dropdown-item" href="https://16colo.rs/artist/">ARTISTS</a>
+                  <a class="dropdown-item" href="https://16colo.rs/group/">GROUPS</a>
+                </div>
+              </div>
+            </div>
+          </div>
+          <a class="navbar-item" href="/faq/">FAQ</a>
+          <a class="navbar-item" href="/upload/">UPLOAD</a>
+          <a class="navbar-item" href="/tags/">TAGS</a>
+          <a class="navbar-item" href="https://forum.16colo.rs/">FORUM</a>
+                    <a class="navbar-item" href="/login/">LOGIN</a>
+                  </div>
+        <div class="dropdown is-right is-hoverable" style="margin-right: 10px;">
+          <div class="dropdown-trigger">
+            <a class="navbar-item" href="/search/">SEARCH</a>
+          </div>
+                    <div class="dropdown-menu" id="dropdown-search" role="menu">
+            <div class="dropdown-content" id="quicksearch">
+              <div class="dropdown-item">
+<!--section class="section" id="search-art"-->
+<!--div class="container"-->
+<form method="post" action="/search/">
+<div style="width: 600px;">
+
+<div class="columns">
+  <div class="column is-12">
+    <label class="label is-small">Content:</label>
+    <div class="control">
+      <input class="input" name="content" type="text" placeholder="" value="">
+    </div>
+    <p class="help">searches text + SAUCE data</p>
+  </div>
+</div>
+<div class="columns">
+  <div class="column is-6">
+    <label class="label is-small">artist prefix:</label>
+    <div class="field-label">
+      <div class="control">
+        <input class="input" name="prefix" type="text" placeholder="eg: tt" value="">
+      </div>
+      <p class="help">search on artist filename prefixes (usually 2 to 3 characters)</p>
+    </div>
+  </div>
+  <div class="column is-6">
+    <label class="label is-small">filename suffix:</label>
+    <div class="control">
+      <input class="input" name="suffix" type="text" placeholder="eg: chan0" value="">
+    </div>
+    <p class="help">search for filename suffix, the non-artist part of the filename</p>
+  </div>
+</div>
+<div class="columns">
+  <div class="column is-6">
+    <label class="label is-small">filetype:</label>
+    <div class="control">
+      <input class="input" name="extension" type="text" placeholder="eg: ANS" value="">
+    </div>
+    <p class="help">search on file extension such as ANS, ICE, RIP, LIT or DRK </p>
+  </div>
+  <div class="column is-3">
+    <label class="label is-small">year:</label>
+    <div class="select">
+      <select name="year">
+        <option>any</option>
+          <option>1990</option>
+  <option>1991</option>
+  <option>1992</option>
+  <option>1993</option>
+  <option>1994</option>
+  <option>1995</option>
+  <option>1996</option>
+  <option>1997</option>
+  <option>1998</option>
+  <option>1999</option>
+  <option>2000</option>
+  <option>2001</option>
+  <option>2002</option>
+  <option>2003</option>
+  <option>2004</option>
+  <option>2005</option>
+  <option>2006</option>
+  <option>2007</option>
+  <option>2008</option>
+  <option>2009</option>
+  <option>2010</option>
+  <option>2011</option>
+  <option>2012</option>
+  <option>2013</option>
+  <option>2014</option>
+  <option>2015</option>
+  <option>2016</option>
+  <option>2017</option>
+  <option>2018</option>
+  <option>2019</option>
+  <option>2020</option>
+  <option>2021</option>
+  <option>2022</option>
+  <option>2023</option>
+  <option>2024</option>
+  <option>2025</option>
+  <option>2026</option>
+      </select>
+    </div>
+    <p class="help">search on release year</p>
+  </div>
+  <div class="column is-3">
+    <label class="label is-small">results:</label>
+    <div class="select">
+      <select name="results">
+        <option>100</option>
+        <option>200</option>
+        <option>300</option>
+        <option>400</option>
+        <option>500</option>
+      </select>
+    </div>
+  </div>
+</div>
+
+<p class="content">more advanced search options are available on the <a href="/search/">search page</a></p>
+
+
+<div class="columns">
+  <div class="column is-6">
+  </div>
+  <div class="column is-4">
+    <div class="field is-grouped">
+      <p class="control is-right">
+        <input type="hidden" name="search" value="art">
+        <input type="submit" value="Search" class="button is-primary">
+        <input type="reset" value="Reset" class="button is-white">
+      </p>
+    </div>
+  </div>
+</div>
+</div>
+
+</form>
+<!--/div-->
+<!--/section-->
+</div>
+            </div>
+          </div>
+                  </div>
+      </div>
+    </nav>
+</header>
+<main>
+<section class="section msection">
+<div class="container">
+<div class="err-dos is-inline-block">
+C:\&gt;dir
+
+  Volume in drive C has no label
+  Volume Serial Number is 16C-01-075
+  Directory of C:\
+
+<span class="has-text-danger">File not found</span>
+
+                          <span class="has-text-danger">404</span> MB free
+C:\&gt;<span class="blink">_</span>
+</div>
+</div>
+</section>
+</main>
+<footer class="footer" >
+  <div class="content has-text-centered">
+    <p>
+      <img src="/16c.svg" id="footerlogo" width="120" height="41" style="vertical-align:middle" alt="16colo.rs"> ASCII and ANSI art archive - <a href="/privacy-policy/">privacy & cookie policy</a>
+    </p>
+  </div>
+  <div class="tagline tags is-hidden-mobile" style="margin-bottom: 0;">
+    <div class="tags has-addons">
+      <span class="tag">
+        <span class="icon">
+          <i class="icon ion-logo-facebook" style="color: #3B5998; margin-left: .4em; margin-right: .2em;"></i>
+        </span>
+      </span>
+      <a class="tag tag-social-text" href="https://www.facebook.com/sixteencolors/">facebook</a>
+    </div>
+    <div class="tags has-addons">
+      <span class="tag">
+        <span class="icon">
+          <i class="icon ion-logo-twitter" style="color: #00ACEE; margin-left: .4em; margin-right: .2em;"></i>
+        </span>
+      </span>
+      <a class="tag tag-social-text" href="https://twitter.com/sixteencolors">twitter</a>
+    </div>
+    <div class="tags has-addons">
+      <span class="tag">
+        <span class="icon">
+          <i class="icon ion-logo-instagram" style="color: #8134AF; margin-left: .4em; margin-right: .2em;"></i>
+        </span>
+      </span>
+      <a class="tag tag-social-text" href="https://www.instagram.com/sixteen_colors/">instagram</a>
+    </div>
+    <div class="tags has-addons">
+      <span class="tag">
+        <span class="icon">
+          <i class="icon ion-logo-rss" style="color: #ee802f; margin-left: .4em; margin-right: .2em;"></i>
+        </span>
+      </span>
+      <a class="tag tag-social-text" href="/rss/">rss</a>
+    </div>
+  </div>
+  <div class="tagline tags">
+    <div class="tags has-addons is-hidden-mobile">
+      <span class="tag">built with</span>
+      <a class="tag is-success" href="https://www.ansilove.org/">ansilove</a>
+    </div>
+    <div class="tags has-addons is-hidden-mobile">
+      <span class="tag">built with</span>
+      <a class="tag is-danger" href="http://picoe.ca/products/pablodraw/">pablodraw</a>
+    </div>
+    <div class="tags has-addons is-hidden-mobile">
+      <span class="tag">integrated with</span>
+      <a class="tag is-primary" href="https://blocktronics.github.io/moebius/">moebius</a>
+    </div>
+    <div class="control">
+      <div id="reportlink"></div>
+    </div>
+  </div>
+  <script>
+    window.onload = function() {
+      if (window.jQuery) {  
+        $("#reportlink").append('<a class="button is-small is-link report" id="report">report a problem</a>');
+        $(".report").click(function() {
+          $("#msg").load("/inc/report.php");
+        });
+      }
+    }
+  </script>
+</footer>
+<div id="msg">
+<link href="/css/ionicons.min.css" rel="stylesheet">
+<script>
+  $('.navbar-item').each(function(e) {
+    $(this).click(function(){
+      if($('#navbar-burger-id').hasClass('is-active')){
+        $('#navbar-burger-id').removeClass('is-active');
+        $('#navbar-menu-id').removeClass('is-active');
+      }
+    });
+  });
+
+  $('#navbar-burger-id').click(function () {
+    if($('#navbar-burger-id').hasClass('is-active')){
+      $('#navbar-burger-id').removeClass('is-active');
+      $('#navbar-menu-id').removeClass('is-active');
+    }else {
+      $('#navbar-burger-id').addClass('is-active');
+      $('#navbar-menu-id').addClass('is-active');
+    }
+  });
+</script><script async src="https://www.googletagmanager.com/gtag/js?id=UA-129026834-1"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'UA-129026834-1');
+</script>
+</body>
+</html>
