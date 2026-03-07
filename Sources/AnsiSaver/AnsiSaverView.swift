@@ -13,7 +13,7 @@ class AnsiSaverView: ScreenSaverView {
         super.init(frame: frame, isPreview: isPreview)
         wantsLayer = true
         layer?.backgroundColor = NSColor.black.cgColor
-        animationTimeInterval = 1.0 / 30.0
+        animationTimeInterval = 1.0 / 60.0
 
         if let layer = self.layer {
             animator = Animator(containerLayer: layer)

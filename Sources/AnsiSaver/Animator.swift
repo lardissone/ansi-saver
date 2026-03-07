@@ -127,12 +127,8 @@ class Animator {
 
         let content = CALayer()
         content.masksToBounds = false
-        content.anchorPoint = CGPoint(x: 0, y: 0)
-        content.frame = CGRect(origin: .zero, size: container.bounds.size)
         container.addSublayer(content)
         contentLayer = content
-
-        Configuration.debugLog("startContinuous: container.bounds=\(container.bounds) container.frame=\(container.frame) content.frame=\(content.frame) viewSize=\(viewSize)")
 
         nextContentY = 0
         scrollOffset = 0
@@ -167,8 +163,6 @@ class Animator {
             height: fitHeight
         )
         content.addSublayer(artLayer)
-
-        Configuration.debugLog("appendArt: imageSize=\(image.size) scaleX=\(scaleX) fitWidth=\(fitWidth) fitHeight=\(fitHeight) artFrame=\(artLayer.frame) viewSize=\(viewSize)")
 
         let bottomY = nextContentY + fitHeight
         stackedLayers.append((layer: artLayer, bottomY: bottomY))
@@ -268,7 +262,7 @@ class Animator {
                 phase = .idle
                 return
             }
-            let step = scrollSpeed / 30.0 * scrollDirection
+            let step = scrollSpeed / 60.0 * scrollDirection
             let newY = layer.position.y + step
 
             let done: Bool
@@ -294,12 +288,12 @@ class Animator {
                 return
             }
 
-            let step = scrollSpeed / 30.0
+            let step = scrollSpeed / 60.0
             scrollOffset += step
 
             CATransaction.begin()
             CATransaction.setDisableActions(true)
-            content.position = CGPoint(x: 0, y: scrollOffset)
+            content.bounds.origin.y = -scrollOffset
             CATransaction.commit()
 
             // Remove layers that scrolled off the top
