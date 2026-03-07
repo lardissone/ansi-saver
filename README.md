@@ -27,7 +27,7 @@ AnsiSaver pulls art directly from 16colo.rs packs and scrolls it across your scr
 
 ## Installation
 
-**Requirements:** Apple Silicon Mac, macOS Tahoe (26.0) or later.
+**Requirements:** Apple Silicon Mac, macOS Sequoia (15.0) or later.
 
 ### Download
 
@@ -51,7 +51,7 @@ xcodebuild -project AnsiSaver.xcodeproj -target AnsiSaver -configuration Release
 cp -R build/Release/AnsiSaver.saver ~/Library/Screen\ Savers/
 ```
 
-> **Note:** Builds link statically against Homebrew's libgd (arm64). Requires Apple Silicon Mac with macOS Tahoe (26.0) or later.
+> **Note:** Builds link statically against Homebrew's libgd (arm64). Requires Apple Silicon Mac with macOS Sequoia (15.0) or later.
 
 ## Configuration
 
