@@ -27,7 +27,14 @@ struct Configuration {
 
     var localFolderPath: String? {
         guard let bookmark = localFolderBookmark else { return nil }
-        return Self.resolveBookmark(bookmark)?.path
+        var isStale = false
+        guard let url = try? URL(
+            resolvingBookmarkData: bookmark,
+            options: [.withSecurityScope],
+            relativeTo: nil,
+            bookmarkDataIsStale: &isStale
+        ) else { return nil }
+        return url.path
     }
 
     static func load() -> Configuration {
