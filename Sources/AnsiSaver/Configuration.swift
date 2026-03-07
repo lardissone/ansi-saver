@@ -12,6 +12,8 @@ struct Configuration {
         static let transitionMode = "transitionMode"
         static let scrollSpeed = "scrollSpeed"
         static let scaleFactor = "scaleFactor"
+        static let continuousScroll = "continuousScroll"
+        static let showSeparator = "showSeparator"
     }
 
     var packURLs: [String]
@@ -20,6 +22,8 @@ struct Configuration {
     var transitionMode: Int
     var scrollSpeed: Double
     var scaleFactor: Int
+    var continuousScroll: Bool
+    var showSeparator: Bool
 
     var localFolderPath: String? {
         guard let bookmark = localFolderBookmark else { return nil }
@@ -38,7 +42,11 @@ struct Configuration {
                 : 50.0,
             scaleFactor: defaults.object(forKey: Key.scaleFactor) != nil
                 ? defaults.integer(forKey: Key.scaleFactor)
-                : 2
+                : 2,
+            continuousScroll: defaults.bool(forKey: Key.continuousScroll),
+            showSeparator: defaults.object(forKey: Key.showSeparator) != nil
+                ? defaults.bool(forKey: Key.showSeparator)
+                : true
         )
         Self.debugLog("Config.load() process=\(ProcessInfo.processInfo.processName) bookmark=\(config.localFolderBookmark?.count ?? 0) bytes, packs=\(config.packURLs.count), files=\(config.fileURLs.count), folderPath=\(config.localFolderPath ?? "nil")")
         return config
@@ -52,6 +60,8 @@ struct Configuration {
         defaults.set(transitionMode, forKey: Key.transitionMode)
         defaults.set(scrollSpeed, forKey: Key.scrollSpeed)
         defaults.set(scaleFactor, forKey: Key.scaleFactor)
+        defaults.set(continuousScroll, forKey: Key.continuousScroll)
+        defaults.set(showSeparator, forKey: Key.showSeparator)
         let ok = defaults.synchronize()
         Self.debugLog("Config.save() process=\(ProcessInfo.processInfo.processName) sync=\(ok) bookmark=\(localFolderBookmark?.count ?? 0) bytes, packs=\(packURLs.count)")
     }

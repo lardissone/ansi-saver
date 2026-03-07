@@ -11,6 +11,8 @@ final class ConfigurationTests: XCTestCase {
         defaults.removeObject(forKey: "transitionMode")
         defaults.removeObject(forKey: "scrollSpeed")
         defaults.removeObject(forKey: "scaleFactor")
+        defaults.removeObject(forKey: "continuousScroll")
+        defaults.removeObject(forKey: "showSeparator")
         defaults.synchronize()
         super.tearDown()
     }
@@ -24,6 +26,8 @@ final class ConfigurationTests: XCTestCase {
         XCTAssertEqual(config.transitionMode, 0)
         XCTAssertEqual(config.scrollSpeed, 50.0)
         XCTAssertEqual(config.scaleFactor, 2)
+        XCTAssertFalse(config.continuousScroll)
+        XCTAssertTrue(config.showSeparator)
     }
 
     func testSaveAndLoadURLs() {

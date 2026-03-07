@@ -80,7 +80,12 @@ class AnsiSaverView: ScreenSaverView {
             self.messageLayer = nil
             self.artPaths = allPaths.shuffled()
             Configuration.debugLog("loadArt: found \(allPaths.count) files, first: \(allPaths.first ?? "none")")
-            self.showNextArt()
+
+            if self.config.continuousScroll {
+                self.startContinuousMode()
+            } else {
+                self.showNextArt()
+            }
         }
     }
 
@@ -88,34 +93,66 @@ class AnsiSaverView: ScreenSaverView {
         guard !artPaths.isEmpty else { return }
         guard bounds.size.width > 0, bounds.size.height > 0 else { return }
 
-        if currentIndex >= artPaths.count {
-            artPaths.shuffle()
-            currentIndex = 0
-        }
-
-        let path = artPaths[currentIndex]
-        currentIndex += 1
-
+        let path = nextArtPath()
         let transition = TransitionMode(rawValue: config.transitionMode) ?? .scrollUp
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
             guard let image = Renderer.render(ansFileAt: path, scaleFactor: UInt8(self.config.scaleFactor)) else {
-                DispatchQueue.main.async {
-                    self.showNextArt()
-                }
+                DispatchQueue.main.async { self.showNextArt() }
                 return
             }
 
             DispatchQueue.main.async {
-                self.animator?.display(
-                    image: image,
-                    transition: transition,
+                if self.config.continuousScroll {
+                    let fileName = (path as NSString).lastPathComponent
+                    self.animator?.appendArt(image: image, fileName: fileName, showSeparator: self.config.showSeparator)
+                } else {
+                    self.animator?.display(
+                        image: image,
+                        transition: transition,
+                        speed: self.config.scrollSpeed,
+                        viewSize: self.bounds.size
+                    )
+                }
+            }
+        }
+    }
+
+    private func startContinuousMode() {
+        guard !artPaths.isEmpty else { return }
+        guard bounds.size.width > 0, bounds.size.height > 0 else { return }
+
+        let path = nextArtPath()
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            guard let image = Renderer.render(ansFileAt: path, scaleFactor: UInt8(self.config.scaleFactor)) else {
+                DispatchQueue.main.async { self.startContinuousMode() }
+                return
+            }
+
+            DispatchQueue.main.async {
+                let fileName = (path as NSString).lastPathComponent
+                self.animator?.startContinuousScroll(
+                    firstImage: image,
+                    fileName: fileName,
                     speed: self.config.scrollSpeed,
-                    viewSize: self.bounds.size
+                    viewSize: self.bounds.size,
+                    showSeparator: self.config.showSeparator
                 )
             }
         }
+    }
+
+    private func nextArtPath() -> String {
+        if currentIndex >= artPaths.count {
+            artPaths.shuffle()
+            currentIndex = 0
+        }
+        let path = artPaths[currentIndex]
+        currentIndex += 1
+        return path
     }
 
     private func showMessage(_ text: String) {
@@ -152,14 +189,11 @@ class AnsiSaverView: ScreenSaverView {
     }
 
     override var hasConfigureSheet: Bool {
-        NSLog("AnsiSaver: hasConfigureSheet called, returning true")
         return true
     }
 
     override var configureSheet: NSWindow? {
-        NSLog("AnsiSaver: configureSheet called")
         let sheet = ConfigSheet(config: Configuration.load())
-        NSLog("AnsiSaver: ConfigSheet created, window = \(sheet.configWindow)")
         configSheet = sheet
         return sheet.configWindow
     }

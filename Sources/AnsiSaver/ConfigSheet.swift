@@ -6,21 +6,20 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     private var config: Configuration
 
     private var packURLs: [String] = []
-    private var fileURLs: [String] = []
     private var folderBookmark: Data?
 
     private var packTable: NSTableView!
-    private var fileTable: NSTableView!
     private var folderPathControl: NSPathControl!
     private var transitionPopup: NSPopUpButton!
     private var speedSlider: NSSlider!
     private var speedLabel: NSTextField!
     private var scalePopup: NSPopUpButton!
+    private var continuousCheck: NSButton!
+    private var separatorCheck: NSButton!
 
     init(config: Configuration) {
         self.config = config
         self.packURLs = config.packURLs
-        self.fileURLs = config.fileURLs
         self.folderBookmark = config.localFolderBookmark
         super.init()
         buildWindow()
@@ -30,7 +29,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
 
     private func buildWindow() {
         window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 520, height: 576),
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 480),
             styleMask: [.titled],
             backing: .buffered,
             defer: true
@@ -41,20 +40,12 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         contentView.autoresizingMask = [.width, .height]
         window.contentView = contentView
 
-        var y: CGFloat = 536
+        var y: CGFloat = 440
 
         // Pack URLs section
         y = addLabel("16colo.rs Pack URLs:", to: contentView, y: y)
         y = addTableSection(table: &packTable, tag: 0, to: contentView, y: y)
         y = addAddRemoveButtons(addAction: #selector(addPackURL), removeAction: #selector(removePackURL),
-                                to: contentView, y: y)
-
-        y -= 10
-
-        // File URLs section
-        y = addLabel("Individual File URLs:", to: contentView, y: y)
-        y = addTableSection(table: &fileTable, tag: 1, to: contentView, y: y)
-        y = addAddRemoveButtons(addAction: #selector(addFileURL), removeAction: #selector(removeFileURL),
                                 to: contentView, y: y)
 
         y -= 10
@@ -104,6 +95,20 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         scalePopup.selectItem(at: config.scaleFactor - 1)
         contentView.addSubview(scalePopup)
         y -= 14
+
+        // Continuous scroll
+        continuousCheck = NSButton(checkboxWithTitle: "Continuous scroll", target: self, action: #selector(continuousChanged))
+        continuousCheck.frame = NSRect(x: 20, y: y - 20, width: 200, height: 18)
+        continuousCheck.state = config.continuousScroll ? .on : .off
+        contentView.addSubview(continuousCheck)
+        y -= 24
+
+        separatorCheck = NSButton(checkboxWithTitle: "Show separator between files", target: nil, action: nil)
+        separatorCheck.frame = NSRect(x: 40, y: y - 20, width: 240, height: 18)
+        separatorCheck.state = config.showSeparator ? .on : .off
+        separatorCheck.isEnabled = config.continuousScroll
+        contentView.addSubview(separatorCheck)
+        y -= 28
 
         // Refetch button
         let refetchButton = NSButton(title: "Refetch Packs", target: self, action: #selector(refetchPacks))
@@ -171,20 +176,16 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     // MARK: - NSTableViewDataSource
 
     func numberOfRows(in tableView: NSTableView) -> Int {
-        return tableView.tag == 0 ? packURLs.count : fileURLs.count
+        return packURLs.count
     }
 
     func tableView(_ tableView: NSTableView, objectValueFor tableColumn: NSTableColumn?, row: Int) -> Any? {
-        return tableView.tag == 0 ? packURLs[row] : fileURLs[row]
+        return packURLs[row]
     }
 
     func tableView(_ tableView: NSTableView, setObjectValue object: Any?, for tableColumn: NSTableColumn?, row: Int) {
         guard let value = object as? String else { return }
-        if tableView.tag == 0 {
-            packURLs[row] = value
-        } else {
-            fileURLs[row] = value
-        }
+        packURLs[row] = value
     }
 
     // MARK: - Actions
@@ -200,19 +201,6 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         guard row >= 0 else { return }
         packURLs.remove(at: row)
         packTable.reloadData()
-    }
-
-    @objc private func addFileURL() {
-        fileURLs.append("")
-        fileTable.reloadData()
-        fileTable.editColumn(0, row: fileURLs.count - 1, with: nil, select: true)
-    }
-
-    @objc private func removeFileURL() {
-        let row = fileTable.selectedRow
-        guard row >= 0 else { return }
-        fileURLs.remove(at: row)
-        fileTable.reloadData()
     }
 
     @objc private func browseFolder() {
@@ -233,6 +221,10 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         speedLabel.stringValue = "\(Int(speedSlider.doubleValue)) px/s"
     }
 
+    @objc private func continuousChanged() {
+        separatorCheck.isEnabled = continuousCheck.state == .on
+    }
+
     @objc private func refetchPacks() {
         Cache.clearPacks()
         let alert = NSAlert()
@@ -243,11 +235,12 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
 
     @objc private func okPressed() {
         config.packURLs = packURLs.filter { !$0.isEmpty }
-        config.fileURLs = fileURLs.filter { !$0.isEmpty }
         config.localFolderBookmark = folderBookmark
         config.transitionMode = transitionPopup.indexOfSelectedItem
         config.scrollSpeed = speedSlider.doubleValue
         config.scaleFactor = scalePopup.indexOfSelectedItem + 1
+        config.continuousScroll = continuousCheck.state == .on
+        config.showSeparator = separatorCheck.state == .on
         config.save()
 
         window.sheetParent?.endSheet(window)
