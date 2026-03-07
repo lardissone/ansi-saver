@@ -10,6 +10,7 @@ final class ConfigurationTests: XCTestCase {
         defaults.removeObject(forKey: "localFolderBookmark")
         defaults.removeObject(forKey: "transitionMode")
         defaults.removeObject(forKey: "scrollSpeed")
+        defaults.removeObject(forKey: "scaleFactor")
         defaults.synchronize()
         super.tearDown()
     }
@@ -22,6 +23,7 @@ final class ConfigurationTests: XCTestCase {
         XCTAssertNil(config.localFolderPath)
         XCTAssertEqual(config.transitionMode, 0)
         XCTAssertEqual(config.scrollSpeed, 50.0)
+        XCTAssertEqual(config.scaleFactor, 2)
     }
 
     func testSaveAndLoadURLs() {

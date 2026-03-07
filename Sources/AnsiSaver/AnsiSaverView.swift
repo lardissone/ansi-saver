@@ -22,6 +22,7 @@ class AnsiSaverView: ScreenSaverView {
             }
         }
 
+        Configuration.debugLog("AnsiSaverView.init process=\(ProcessInfo.processInfo.processName) isPreview=\(isPreview)")
         loadArt()
     }
 
@@ -78,12 +79,14 @@ class AnsiSaverView: ScreenSaverView {
             self.messageLayer?.removeFromSuperlayer()
             self.messageLayer = nil
             self.artPaths = allPaths.shuffled()
+            Configuration.debugLog("loadArt: found \(allPaths.count) files, first: \(allPaths.first ?? "none")")
             self.showNextArt()
         }
     }
 
     private func showNextArt() {
         guard !artPaths.isEmpty else { return }
+        guard bounds.size.width > 0, bounds.size.height > 0 else { return }
 
         if currentIndex >= artPaths.count {
             artPaths.shuffle()
@@ -97,7 +100,7 @@ class AnsiSaverView: ScreenSaverView {
 
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
-            guard let image = Renderer.render(ansFileAt: path) else {
+            guard let image = Renderer.render(ansFileAt: path, scaleFactor: UInt8(self.config.scaleFactor)) else {
                 DispatchQueue.main.async {
                     self.showNextArt()
                 }
@@ -140,6 +143,7 @@ class AnsiSaverView: ScreenSaverView {
     }
 
     override func animateOneFrame() {
+        animator?.tick()
     }
 
     override func stopAnimation() {
@@ -148,11 +152,14 @@ class AnsiSaverView: ScreenSaverView {
     }
 
     override var hasConfigureSheet: Bool {
+        NSLog("AnsiSaver: hasConfigureSheet called, returning true")
         return true
     }
 
     override var configureSheet: NSWindow? {
+        NSLog("AnsiSaver: configureSheet called")
         let sheet = ConfigSheet(config: Configuration.load())
+        NSLog("AnsiSaver: ConfigSheet created, window = \(sheet.configWindow)")
         configSheet = sheet
         return sheet.configWindow
     }

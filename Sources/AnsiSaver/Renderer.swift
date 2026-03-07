@@ -2,7 +2,7 @@ import AppKit
 
 enum Renderer {
 
-    static func render(ansFileAt path: String) -> NSImage? {
+    static func render(ansFileAt path: String, scaleFactor: UInt8 = 1) -> NSImage? {
         var ctx = ansilove_ctx()
         var options = ansilove_options()
 
@@ -12,6 +12,7 @@ enum Renderer {
         options.font = UInt8(ANSILOVE_FONT_CP437)
         options.bits = 8
         options.icecolors = false
+        options.scale_factor = scaleFactor
 
         guard ansilove_loadfile(&ctx, path) == 0 else { return nil }
         guard ansilove_ansi(&ctx, &options) == 0 else { return nil }

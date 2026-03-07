@@ -478,9 +478,9 @@
 				MTL_FAST_MATH = YES;
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
-					"-lgd",
-					"-lpng",
-					"-ljpeg",
+					/opt/homebrew/lib/libgd.a,
+					/opt/homebrew/opt/libpng/lib/libpng.a,
+					/opt/homebrew/opt/jpeg-turbo/lib/libjpeg.a,
 					"-lz",
 				);
 				SDKROOT = macosx;
@@ -553,9 +553,9 @@
 				MTL_ENABLE_DEBUG_INFO = NO;
 				MTL_FAST_MATH = YES;
 				OTHER_LDFLAGS = (
-					"-lgd",
-					"-lpng",
-					"-ljpeg",
+					/opt/homebrew/lib/libgd.a,
+					/opt/homebrew/opt/libpng/lib/libpng.a,
+					/opt/homebrew/opt/jpeg-turbo/lib/libjpeg.a,
 					"-lz",
 				);
 				SDKROOT = macosx;
@@ -566,8 +566,10 @@
 		A7000021 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = NH85J8FXX5;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;
@@ -585,8 +587,10 @@
 		A7000022 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CODE_SIGN_IDENTITY = "Apple Development";
 				CODE_SIGN_STYLE = Automatic;
 				COMBINE_HIDPI_IMAGES = YES;
+				DEVELOPMENT_TEAM = NH85J8FXX5;
 				CURRENT_PROJECT_VERSION = 1;
 				GENERATE_INFOPLIST_FILE = NO;
 				INFOPLIST_FILE = Info.plist;

@@ -15,6 +15,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     private var transitionPopup: NSPopUpButton!
     private var speedSlider: NSSlider!
     private var speedLabel: NSTextField!
+    private var scalePopup: NSPopUpButton!
 
     init(config: Configuration) {
         self.config = config
@@ -29,7 +30,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
 
     private func buildWindow() {
         window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 520, height: 540),
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 576),
             styleMask: [.titled],
             backing: .buffered,
             defer: true
@@ -40,7 +41,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         contentView.autoresizingMask = [.width, .height]
         window.contentView = contentView
 
-        var y: CGFloat = 500
+        var y: CGFloat = 536
 
         // Pack URLs section
         y = addLabel("16colo.rs Pack URLs:", to: contentView, y: y)
@@ -95,6 +96,14 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         speedLabel.frame = NSRect(x: 410, y: y + 2, width: 80, height: 20)
         contentView.addSubview(speedLabel)
         y -= 20
+
+        // Scale factor
+        y = addLabel("Render Scale:", to: contentView, y: y)
+        scalePopup = NSPopUpButton(frame: NSRect(x: 120, y: y + 2, width: 180, height: 24))
+        scalePopup.addItems(withTitles: ["1x", "2x", "3x", "4x"])
+        scalePopup.selectItem(at: config.scaleFactor - 1)
+        contentView.addSubview(scalePopup)
+        y -= 14
 
         // Refetch button
         let refetchButton = NSButton(title: "Refetch Packs", target: self, action: #selector(refetchPacks))
@@ -238,6 +247,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         config.localFolderBookmark = folderBookmark
         config.transitionMode = transitionPopup.indexOfSelectedItem
         config.scrollSpeed = speedSlider.doubleValue
+        config.scaleFactor = scalePopup.indexOfSelectedItem + 1
         config.save()
 
         window.sheetParent?.endSheet(window)
