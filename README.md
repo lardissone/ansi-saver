@@ -15,6 +15,10 @@ Remember dialing into BBSes at 14.4k, watching ANSI art fill your terminal line 
 
 AnsiSaver pulls art directly from 16colo.rs packs and scrolls it across your screen, rendered with the same [libansilove](https://www.ansilove.org/) library the archive uses. It's like leaving your terminal connected to a BBS you never logged off from.
 
+<p align="center">
+  <img src="docs/screenshot-preview.jpg" alt="AnsiSaver preview in System Settings" width="520">
+</p>
+
 ## What it does
 
 - Downloads ANSI art packs from [16colo.rs](https://16colo.rs) and caches them locally
@@ -28,30 +32,37 @@ AnsiSaver pulls art directly from 16colo.rs packs and scrolls it across your scr
 
 ## Installation
 
-### Prerequisites
+### Download
 
-You need [Homebrew](https://brew.sh/) and Xcode to build from source:
+Grab the latest `AnsiSaver.saver.zip` from the [Releases](https://github.com/lardissone/ansi-saver/releases) page.
+
+1. Unzip the file
+2. Double-click `AnsiSaver.saver`
+3. macOS will ask if you want to install it — click **Install**
+
+> **macOS security notice:** Since the screensaver is not signed with an Apple Developer certificate, macOS will block it on first launch. Go to **System Settings > Privacy & Security**, scroll down, and click **Open Anyway** next to the AnsiSaver message. You only need to do this once.
+
+### Build from source
+
+If you prefer to build it yourself, you need [Homebrew](https://brew.sh/) and Xcode:
 
 ```bash
 brew install libgd
-```
-
-### Build and install
-
-```bash
 git clone --recursive https://github.com/lardissone/ansi-saver.git
 cd ansi-saver
 xcodebuild -project AnsiSaver.xcodeproj -target AnsiSaver -configuration Release build
 cp -R build/Release/AnsiSaver.saver ~/Library/Screen\ Savers/
 ```
 
-Then open **System Settings > Screen Saver** and select **AnsiSaver**.
-
-> **Note:** The screensaver links statically against Homebrew's libgd (arm64). It runs on Apple Silicon Macs with macOS Tahoe (26.0) or later.
+> **Note:** Builds link statically against Homebrew's libgd (arm64). Requires Apple Silicon Mac with macOS Tahoe (26.0) or later.
 
 ## Configuration
 
-Open the screensaver options panel from System Settings to configure:
+Open **System Settings > Screen Saver**, select **AnsiSaver**, and click **Options...** to configure:
+
+<p align="center">
+  <img src="docs/screenshot-configuration.jpg" alt="AnsiSaver configuration panel" width="520">
+</p>
 
 ### Art sources
 
