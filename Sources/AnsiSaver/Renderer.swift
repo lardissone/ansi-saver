@@ -4,6 +4,15 @@ struct RenderResult {
     let image: NSImage
     let pixelWidth: Int
     let pixelHeight: Int
+
+    /// Grid dimensions for the given scale factor.
+    func gridSize(scaleFactor: Int) -> (columns: Int, rows: Int) {
+        let effective = max(scaleFactor, 1)
+        return (
+            columns: max(pixelWidth / (8 * effective), 1),
+            rows: max(pixelHeight / (16 * effective), 1)
+        )
+    }
 }
 
 enum Renderer {
@@ -46,11 +55,12 @@ enum Renderer {
     }
 
     /// Scan the rendered image to find content width (in character columns) per row.
-    /// A character cell is considered empty if all its pixels are black (RGB < 3).
+    /// A character cell is considered empty if each of its R, G, B channels is <= 2.
     /// This allows modem simulation to skip trailing blank columns per row.
     static func contentColumnsPerRow(for result: RenderResult, columns: Int, rows: Int) -> [Int] {
         guard columns > 0, rows > 0 else { return [] }
         guard let cgImage = result.image.cgImage(forProposedRect: nil, context: nil, hints: nil) else {
+            Configuration.debugLog("contentColumnsPerRow: failed to get cgImage")
             return Array(repeating: columns, count: rows)
         }
 
@@ -71,6 +81,7 @@ enum Renderer {
             space: colorSpace,
             bitmapInfo: bitmapInfo
         ) else {
+            Configuration.debugLog("contentColumnsPerRow: CGContext creation failed (width=\(width), height=\(height))")
             return Array(repeating: columns, count: rows)
         }
 

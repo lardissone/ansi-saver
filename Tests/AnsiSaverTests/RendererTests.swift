@@ -35,6 +35,21 @@ final class RendererTests: XCTestCase {
             XCTAssertGreaterThanOrEqual(cols, 0)
             XCTAssertLessThanOrEqual(cols, columns)
         }
+        // First row of sample.ans should have visible content
+        XCTAssertGreaterThan(contentCols[0], 0, "First row should have visible content")
+        // At least some rows should have trailing empty columns
+        let hasTrailingBlanks = contentCols.contains(where: { $0 < columns })
+        XCTAssertTrue(hasTrailingBlanks, "At least some rows should have trailing empty columns")
+    }
+
+    func testGridSize() throws {
+        let fixturePath = fixturesPath().appendingPathComponent("sample.ans").path
+        let result = try XCTUnwrap(Renderer.renderWithInfo(ansFileAt: fixturePath))
+        let (columns, rows) = result.gridSize(scaleFactor: 1)
+        XCTAssertGreaterThan(columns, 0)
+        XCTAssertGreaterThan(rows, 0)
+        XCTAssertEqual(columns, result.pixelWidth / 8)
+        XCTAssertEqual(rows, result.pixelHeight / 16)
     }
 
     func testRenderReturnsNilForMissingFile() {

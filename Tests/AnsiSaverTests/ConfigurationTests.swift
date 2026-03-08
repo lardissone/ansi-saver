@@ -30,8 +30,8 @@ final class ConfigurationTests: XCTestCase {
         XCTAssertEqual(config.scaleFactor, 2)
         XCTAssertFalse(config.continuousScroll)
         XCTAssertTrue(config.showSeparator)
-        XCTAssertEqual(config.displayMode, 0)
-        XCTAssertEqual(config.modemSpeed, 2400)
+        XCTAssertEqual(config.displayMode, .modern)
+        XCTAssertEqual(config.modemSpeed, .baud2400)
         XCTAssertFalse(config.isModemMode)
     }
 
@@ -52,14 +52,32 @@ final class ConfigurationTests: XCTestCase {
 
     func testSaveAndLoadModemSettings() {
         var config = Configuration.load()
-        config.displayMode = 1
-        config.modemSpeed = 9600
+        config.displayMode = .modem
+        config.modemSpeed = .baud9600
         config.save()
 
         let loaded = Configuration.load()
-        XCTAssertEqual(loaded.displayMode, 1)
-        XCTAssertEqual(loaded.modemSpeed, 9600)
+        XCTAssertEqual(loaded.displayMode, .modem)
+        XCTAssertEqual(loaded.modemSpeed, .baud9600)
         XCTAssertTrue(loaded.isModemMode)
+    }
+
+    func testCorruptedModemSpeedFallsBackToDefault() {
+        let defaults = ScreenSaverDefaults(forModuleWithName: "com.lardissone.AnsiSaver")!
+        defaults.set(0, forKey: "modemSpeed")
+        defaults.synchronize()
+
+        let config = Configuration.load()
+        XCTAssertEqual(config.modemSpeed, .baud2400)
+    }
+
+    func testCorruptedDisplayModeFallsBackToDefault() {
+        let defaults = ScreenSaverDefaults(forModuleWithName: "com.lardissone.AnsiSaver")!
+        defaults.set(99, forKey: "displayMode")
+        defaults.synchronize()
+
+        let config = Configuration.load()
+        XCTAssertEqual(config.displayMode, .modern)
     }
 
     func testBookmarkCreation() {

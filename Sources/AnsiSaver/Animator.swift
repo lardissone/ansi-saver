@@ -7,6 +7,52 @@ enum TransitionMode: Int {
     case crossfade = 2
 }
 
+struct ModemRevealState {
+    var charPosition: CGFloat = 0
+    var columns: Int = 80
+    var rows: Int = 25
+    var displayCharWidth: CGFloat = 0
+    var displayCharHeight: CGFloat = 0
+    var charsPerFrame: CGFloat = 0
+    var totalChars: Int = 0
+    var maskLayer: CAShapeLayer?
+    var fitHeight: CGFloat = 0
+    var contentCols: [Int] = []
+    /// Prefix-sum of effective char counts; has rows+1 elements.
+    var cumulativeChars: [Int] = []
+    /// Y offset where current image begins in the content stack.
+    var imageStartY: CGFloat = 0
+
+    /// Build cumulative char offsets from per-row content widths.
+    /// Each row costs max(contentCols, 1) effective chars — the 1 accounts
+    /// for CR/LF on fully empty rows.
+    mutating func buildCumulativeChars() {
+        cumulativeChars = [Int](repeating: 0, count: rows + 1)
+        for r in 0..<rows {
+            let rowChars = r < contentCols.count ? max(contentCols[r], 1) : columns
+            cumulativeChars[r + 1] = cumulativeChars[r] + rowChars
+        }
+        totalChars = cumulativeChars[rows]
+    }
+
+    /// Map a linear character index to (row, col) using cumulative offsets.
+    func rowAndColumn(forCharIndex charIndex: Int) -> (row: Int, col: Int) {
+        var row = 0
+        for r in 0..<rows {
+            if charIndex < cumulativeChars[r + 1] {
+                row = r
+                break
+            }
+        }
+        let colInRow = charIndex - cumulativeChars[row]
+        // Clamp col to the content width for this row (the extra 1 for CR/LF
+        // shouldn't extend the visible reveal beyond the content)
+        let rowContent = row < contentCols.count ? contentCols[row] : columns
+        let col = min(colInRow, rowContent)
+        return (row, col)
+    }
+}
+
 class Animator {
 
     private weak var containerLayer: CALayer?
@@ -39,18 +85,7 @@ class Animator {
     private var pendingNextArt = false
 
     // Modem simulation state
-    private var modemCharPosition: CGFloat = 0
-    private var modemColumns: Int = 80
-    private var modemRows: Int = 25
-    private var modemDisplayCharWidth: CGFloat = 0
-    private var modemDisplayCharHeight: CGFloat = 0
-    private var modemCharsPerFrame: CGFloat = 0
-    private var modemTotalChars: Int = 0
-    private var modemMaskLayer: CAShapeLayer?
-    private var modemFitHeight: CGFloat = 0
-    private var modemContentCols: [Int] = []      // actual content width per row
-    private var modemCumulativeChars: [Int] = []  // cumulative char offsets per row
-    private var modemImageStartY: CGFloat = 0     // top of current image in content stack
+    private var modemState = ModemRevealState()
 
     var onAnimationComplete: (() -> Void)?
     var onNeedNextArt: ((_ callback: @escaping (NSImage, String) -> Void) -> Void)?
@@ -63,7 +98,10 @@ class Animator {
     // MARK: - Standard mode
 
     func display(image: NSImage, transition: TransitionMode, speed: Double, viewSize: NSSize) {
-        guard let container = containerLayer else { return }
+        guard let container = containerLayer else {
+            Configuration.debugLog("display: containerLayer is nil")
+            return
+        }
         self.viewSize = viewSize
 
         let imageSize = image.size
@@ -133,66 +171,11 @@ class Animator {
 
     // MARK: - Modem simulation mode
 
-    func displayModem(image: NSImage, columns: Int, rows: Int, contentColumnsPerRow: [Int], modemSpeed: Int, viewSize: NSSize) {
-        guard let container = containerLayer else { return }
-        self.viewSize = viewSize
-
-        stopAnimations()
-
-        let imageSize = image.size
-        let scaleX = viewSize.width / imageSize.width
-        let fitWidth = imageSize.width * scaleX
-        let fitHeight = imageSize.height * scaleX
-
-        let newLayer = CALayer()
-        newLayer.contents = image
-        newLayer.contentsGravity = .resize
-        newLayer.frame = CGRect(
-            x: (viewSize.width - fitWidth) / 2,
-            y: 0,
-            width: fitWidth,
-            height: fitHeight
-        )
-
-        // Position image with top at top of view
-        newLayer.position = CGPoint(
-            x: newLayer.frame.midX,
-            y: viewSize.height - fitHeight / 2
-        )
-
-        // Create mask layer (initially empty — nothing visible)
-        let mask = CAShapeLayer()
-        mask.frame = newLayer.bounds
-        newLayer.mask = mask
-
-        container.addSublayer(newLayer)
-        currentLayer = newLayer
-        modemMaskLayer = mask
-
-        modemColumns = max(columns, 1)
-        modemRows = max(rows, 1)
-        modemDisplayCharWidth = fitWidth / CGFloat(modemColumns)
-        modemDisplayCharHeight = fitHeight / CGFloat(modemRows)
-        modemCharsPerFrame = CGFloat(modemSpeed) / 10.0 / 60.0
-        modemCharPosition = 0
-        modemFitHeight = fitHeight
-
-        // Build per-row content widths and cumulative char offsets.
-        // Each row costs max(contentCols, 1) effective chars — the 1 accounts
-        // for CR/LF on fully empty rows.
-        modemContentCols = contentColumnsPerRow
-        modemCumulativeChars = [Int](repeating: 0, count: modemRows + 1)
-        for r in 0..<modemRows {
-            let rowChars = r < modemContentCols.count ? max(modemContentCols[r], 1) : modemColumns
-            modemCumulativeChars[r + 1] = modemCumulativeChars[r] + rowChars
+    func startModemContinuous(firstImage: NSImage, columns: Int, rows: Int, contentColumnsPerRow: [Int], modemSpeed: ModemSpeed, viewSize: NSSize) {
+        guard let container = containerLayer else {
+            Configuration.debugLog("startModemContinuous: containerLayer is nil")
+            return
         }
-        modemTotalChars = modemCumulativeChars[modemRows]
-
-        phase = .startPause(until: CACurrentMediaTime() + 1.0)
-    }
-
-    func startModemContinuous(firstImage: NSImage, columns: Int, rows: Int, contentColumnsPerRow: [Int], modemSpeed: Int, viewSize: NSSize) {
-        guard let container = containerLayer else { return }
         self.viewSize = viewSize
 
         stopAnimations()
@@ -207,14 +190,18 @@ class Animator {
         stackedLayers = []
         pendingNextArt = false
 
-        modemCharsPerFrame = CGFloat(modemSpeed) / 10.0 / 60.0
+        modemState.charsPerFrame = modemSpeed.charsPerFrame
 
         appendModemArt(image: firstImage, columns: columns, rows: rows, contentColumnsPerRow: contentColumnsPerRow)
         phase = .startPause(until: CACurrentMediaTime() + 1.0)
     }
 
     func appendModemArt(image: NSImage, columns: Int, rows: Int, contentColumnsPerRow: [Int]) {
-        guard let content = contentLayer else { return }
+        guard let content = contentLayer else {
+            Configuration.debugLog("appendModemArt: contentLayer is nil, firing completion")
+            onAnimationComplete?()
+            return
+        }
 
         let imageSize = image.size
         let scaleX = viewSize.width / imageSize.width
@@ -231,81 +218,70 @@ class Animator {
             height: fitHeight
         )
 
+        // Create mask layer (initially empty — nothing visible)
         let mask = CAShapeLayer()
         mask.frame = artLayer.bounds
         artLayer.mask = mask
 
         content.addSublayer(artLayer)
 
-        modemImageStartY = nextContentY
+        modemState.imageStartY = nextContentY
         let bottomY = nextContentY + fitHeight
         stackedLayers.append((layer: artLayer, bottomY: bottomY))
         nextContentY = bottomY
 
         currentLayer = artLayer
-        modemMaskLayer = mask
-        modemColumns = max(columns, 1)
-        modemRows = max(rows, 1)
-        modemDisplayCharWidth = fitWidth / CGFloat(modemColumns)
-        modemDisplayCharHeight = fitHeight / CGFloat(modemRows)
-        modemCharPosition = 0
-        modemFitHeight = fitHeight
-
-        modemContentCols = contentColumnsPerRow
-        modemCumulativeChars = [Int](repeating: 0, count: modemRows + 1)
-        for r in 0..<modemRows {
-            let rowChars = r < modemContentCols.count ? max(modemContentCols[r], 1) : modemColumns
-            modemCumulativeChars[r + 1] = modemCumulativeChars[r] + rowChars
-        }
-        modemTotalChars = modemCumulativeChars[modemRows]
+        modemState.maskLayer = mask
+        modemState.columns = max(columns, 1)
+        modemState.rows = max(rows, 1)
+        modemState.displayCharWidth = fitWidth / CGFloat(modemState.columns)
+        modemState.displayCharHeight = fitHeight / CGFloat(modemState.rows)
+        modemState.charPosition = 0
+        modemState.fitHeight = fitHeight
+        modemState.contentCols = contentColumnsPerRow
+        modemState.buildCumulativeChars()
 
         pendingNextArt = false
         phase = .modemRevealing
     }
 
     private func tickModemReveal() {
-        guard let layer = currentLayer, let mask = modemMaskLayer else {
+        guard let layer = currentLayer, let mask = modemState.maskLayer else {
+            Configuration.debugLog("tickModemReveal: lost layer or mask reference")
             phase = .idle
+            onAnimationComplete?()
             return
         }
 
-        modemCharPosition += modemCharsPerFrame
-        let charIndex = min(Int(modemCharPosition), modemTotalChars)
+        modemState.charPosition += modemState.charsPerFrame
+        let charIndex = min(Int(modemState.charPosition), modemState.totalChars)
 
-        if charIndex >= modemTotalChars {
+        if charIndex >= modemState.totalChars {
             // Fully revealed — remove mask, pause with jitter before next file
             layer.mask = nil
-            modemMaskLayer = nil
+            modemState.maskLayer = nil
             let jitter = Double.random(in: 0...1.0)
             phase = .endPause(until: CACurrentMediaTime() + 2.0 + jitter)
+            // Prefetch next art during the pause so there's no stall
+            if !pendingNextArt {
+                pendingNextArt = true
+                onAnimationComplete?()
+            }
             return
         }
 
-        // Map linear char position to (row, col) using cumulative offsets.
-        // Each row has a variable effective width based on actual content.
-        var row = 0
-        for r in 0..<modemRows {
-            if charIndex < modemCumulativeChars[r + 1] {
-                row = r
-                break
-            }
-        }
-        let colInRow = charIndex - modemCumulativeChars[row]
-        // Clamp col to the content width for this row (the extra 1 for CR/LF
-        // shouldn't extend the visible reveal beyond the content)
-        let rowContent = row < modemContentCols.count ? modemContentCols[row] : modemColumns
-        let col = min(colInRow, rowContent)
+        let (row, col) = modemState.rowAndColumn(forCharIndex: charIndex)
 
-        let dch = modemDisplayCharHeight
-        let dcw = modemDisplayCharWidth
-        let fitHeight = modemFitHeight
+        let dch = modemState.displayCharHeight
+        let dcw = modemState.displayCharWidth
+        let fitHeight = modemState.fitHeight
         let fitWidth = layer.bounds.width
 
         // Build reveal mask path
         let path = CGMutablePath()
 
-        // Fully revealed rows above current row (full width — trailing black
-        // is already black, so revealing it is invisible)
+        // Fully revealed rows: use full width since trailing empty columns
+        // are black pixels on a black background, making the reveal invisible
         if row > 0 {
             path.addRect(CGRect(
                 x: 0,
@@ -331,7 +307,7 @@ class Animator {
 
         // Scroll content layer to keep cursor visible
         if let content = contentLayer {
-            let cursorAbsY = modemImageStartY + CGFloat(row + 1) * dch
+            let cursorAbsY = modemState.imageStartY + CGFloat(row + 1) * dch
             content.bounds.origin.y = -max(viewSize.height, cursorAbsY)
             scrollOffset = max(0, cursorAbsY - viewSize.height)
 
@@ -347,7 +323,10 @@ class Animator {
     // MARK: - Continuous scroll mode
 
     func startContinuousScroll(firstImage: NSImage, fileName: String, speed: Double, viewSize: NSSize, showSeparator: Bool) {
-        guard let container = containerLayer else { return }
+        guard let container = containerLayer else {
+            Configuration.debugLog("startContinuousScroll: containerLayer is nil")
+            return
+        }
         self.viewSize = viewSize
         scrollSpeed = CGFloat(max(speed, 1))
 
@@ -478,7 +457,7 @@ class Animator {
             if CACurrentMediaTime() >= until {
                 oldLayer?.removeFromSuperlayer()
                 oldLayer = nil
-                if modemMaskLayer != nil {
+                if modemState.maskLayer != nil {
                     phase = .modemRevealing
                 } else if contentLayer != nil {
                     phase = .continuousScrolling
@@ -489,7 +468,9 @@ class Animator {
 
         case .scrolling:
             guard let layer = currentLayer else {
+                Configuration.debugLog("tick scrolling: currentLayer is nil")
                 phase = .idle
+                onAnimationComplete?()
                 return
             }
             let step = scrollSpeed / 60.0 * scrollDirection
@@ -517,7 +498,9 @@ class Animator {
 
         case .continuousScrolling:
             guard let content = contentLayer else {
+                Configuration.debugLog("tick continuousScrolling: contentLayer is nil")
                 phase = .idle
+                onAnimationComplete?()
                 return
             }
 
@@ -556,7 +539,9 @@ class Animator {
         case .endPause(let until):
             if CACurrentMediaTime() >= until {
                 phase = .idle
-                onAnimationComplete?()
+                if !pendingNextArt {
+                    onAnimationComplete?()
+                }
             }
         }
     }
@@ -570,8 +555,7 @@ class Animator {
         contentLayer = nil
         stackedLayers = []
         pendingNextArt = false
-        modemMaskLayer = nil
-        modemImageStartY = 0
+        modemState = ModemRevealState()
         phase = .idle
     }
 }

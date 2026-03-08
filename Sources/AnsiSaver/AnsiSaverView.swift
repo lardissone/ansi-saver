@@ -143,12 +143,10 @@ class AnsiSaverView: ScreenSaverView {
                 return
             }
 
-            // For modem mode, compute content columns per row on background thread
+            // For modem mode, compute content columns per row on background thread (pixel scanning is expensive)
             let modemInfo: (columns: Int, rows: Int, contentCols: [Int])?
             if useModem, let result = renderResult {
-                let effectiveScale = max(Int(sf), 1)
-                let columns = result.pixelWidth / (8 * effectiveScale)
-                let rows = result.pixelHeight / (16 * effectiveScale)
+                let (columns, rows) = result.gridSize(scaleFactor: Int(sf))
                 let contentCols = Renderer.contentColumnsPerRow(for: result, columns: columns, rows: rows)
                 modemInfo = (columns, rows, contentCols)
             } else {
@@ -234,9 +232,7 @@ class AnsiSaverView: ScreenSaverView {
                 return
             }
 
-            let effectiveScale = max(Int(sf), 1)
-            let columns = result.pixelWidth / (8 * effectiveScale)
-            let rows = result.pixelHeight / (16 * effectiveScale)
+            let (columns, rows) = result.gridSize(scaleFactor: Int(sf))
             let contentCols = Renderer.contentColumnsPerRow(for: result, columns: columns, rows: rows)
 
             DispatchQueue.main.async {

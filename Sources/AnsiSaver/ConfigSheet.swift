@@ -22,9 +22,6 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     private var modernViews: [NSView] = []
     private var modemViews: [NSView] = []
 
-    private static let modemSpeeds = [300, 1200, 2400, 9600, 14400, 28800, 33600, 56000]
-    private static let modemLabels = ["300", "1200", "2400", "9600", "14.4k", "28.8k", "33.6k", "56k"]
-
     init(config: Configuration) {
         self.config = config
         self.packURLs = config.packURLs
@@ -45,7 +42,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         } else {
             folderPathControl.url = nil
         }
-        displayModePopup.selectItem(at: newConfig.displayMode)
+        displayModePopup.selectItem(at: newConfig.displayMode.rawValue)
         transitionPopup.selectItem(at: newConfig.transitionMode)
         speedSlider.doubleValue = newConfig.scrollSpeed
         speedValueLabel.stringValue = "\(Int(newConfig.scrollSpeed)) px/s"
@@ -53,7 +50,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         continuousCheck.state = newConfig.continuousScroll ? .on : .off
         separatorCheck.state = newConfig.showSeparator ? .on : .off
         separatorCheck.isEnabled = newConfig.continuousScroll
-        let modemIndex = Self.modemSpeeds.firstIndex(of: newConfig.modemSpeed) ?? 2
+        let modemIndex = ModemSpeed.allCases.firstIndex(of: newConfig.modemSpeed) ?? 2
         modemPopup.selectItem(at: modemIndex)
         updateDisplayMode()
     }
@@ -111,7 +108,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         y = addLabel("Display Mode:", to: contentView, y: y)
         displayModePopup = NSPopUpButton(frame: NSRect(x: 120, y: y + 2, width: 180, height: 24))
         displayModePopup.addItems(withTitles: ["Modern", "Modem"])
-        displayModePopup.selectItem(at: config.displayMode)
+        displayModePopup.selectItem(at: config.displayMode.rawValue)
         displayModePopup.target = self
         displayModePopup.action = #selector(displayModeChanged)
         contentView.addSubview(displayModePopup)
@@ -182,8 +179,8 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
             my -= 22
 
             modemPopup = NSPopUpButton(frame: NSRect(x: 120, y: my + 2, width: 180, height: 24))
-            modemPopup.addItems(withTitles: Self.modemLabels)
-            let modemIndex = Self.modemSpeeds.firstIndex(of: config.modemSpeed) ?? 2
+            modemPopup.addItems(withTitles: ModemSpeed.allCases.map { $0.label })
+            let modemIndex = ModemSpeed.allCases.firstIndex(of: config.modemSpeed) ?? 2
             modemPopup.selectItem(at: modemIndex)
             contentView.addSubview(modemPopup)
             modemViews.append(modemPopup)
@@ -321,7 +318,7 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     }
 
     private func updateDisplayMode() {
-        let isModem = displayModePopup.indexOfSelectedItem == 1
+        let isModem = DisplayMode(rawValue: displayModePopup.indexOfSelectedItem) == .modem
         for view in modernViews { view.isHidden = isModem }
         for view in modemViews { view.isHidden = !isModem }
     }
@@ -342,8 +339,11 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         config.scaleFactor = scalePopup.indexOfSelectedItem + 1
         config.continuousScroll = continuousCheck.state == .on
         config.showSeparator = separatorCheck.state == .on
-        config.displayMode = displayModePopup.indexOfSelectedItem
-        config.modemSpeed = Self.modemSpeeds[modemPopup.indexOfSelectedItem]
+        config.displayMode = DisplayMode(rawValue: displayModePopup.indexOfSelectedItem) ?? .modern
+        let modemIdx = modemPopup.indexOfSelectedItem
+        config.modemSpeed = (modemIdx >= 0 && modemIdx < ModemSpeed.allCases.count)
+            ? ModemSpeed.allCases[modemIdx]
+            : .baud2400
         config.save()
 
         dismissSheet()
