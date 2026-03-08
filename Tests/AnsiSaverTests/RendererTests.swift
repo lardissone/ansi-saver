@@ -12,6 +12,31 @@ final class RendererTests: XCTestCase {
         XCTAssertGreaterThan(image.size.height, 0)
     }
 
+    func testRenderWithInfoProducesPixelDimensions() throws {
+        let fixturePath = fixturesPath().appendingPathComponent("sample.ans").path
+        let result = try XCTUnwrap(Renderer.renderWithInfo(ansFileAt: fixturePath))
+        XCTAssertGreaterThan(result.pixelWidth, 0)
+        XCTAssertGreaterThan(result.pixelHeight, 0)
+        // CP437 at 8px wide, default 80 columns: width should be multiple of 8
+        XCTAssertEqual(result.pixelWidth % 8, 0)
+        // CP437 at 16px tall: height should be multiple of 16
+        XCTAssertEqual(result.pixelHeight % 16, 0)
+    }
+
+    func testContentColumnsPerRow() throws {
+        let fixturePath = fixturesPath().appendingPathComponent("sample.ans").path
+        let result = try XCTUnwrap(Renderer.renderWithInfo(ansFileAt: fixturePath))
+        let columns = result.pixelWidth / 8
+        let rows = result.pixelHeight / 16
+        let contentCols = Renderer.contentColumnsPerRow(for: result, columns: columns, rows: rows)
+        XCTAssertEqual(contentCols.count, rows)
+        // Every entry should be between 0 and columns
+        for cols in contentCols {
+            XCTAssertGreaterThanOrEqual(cols, 0)
+            XCTAssertLessThanOrEqual(cols, columns)
+        }
+    }
+
     func testRenderReturnsNilForMissingFile() {
         let image = Renderer.render(ansFileAt: "/nonexistent/path/file.ans")
         XCTAssertNil(image)

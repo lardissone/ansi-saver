@@ -13,6 +13,8 @@ final class ConfigurationTests: XCTestCase {
         defaults.removeObject(forKey: "scaleFactor")
         defaults.removeObject(forKey: "continuousScroll")
         defaults.removeObject(forKey: "showSeparator")
+        defaults.removeObject(forKey: "displayMode")
+        defaults.removeObject(forKey: "modemSpeed")
         defaults.synchronize()
         super.tearDown()
     }
@@ -28,6 +30,9 @@ final class ConfigurationTests: XCTestCase {
         XCTAssertEqual(config.scaleFactor, 2)
         XCTAssertFalse(config.continuousScroll)
         XCTAssertTrue(config.showSeparator)
+        XCTAssertEqual(config.displayMode, 0)
+        XCTAssertEqual(config.modemSpeed, 2400)
+        XCTAssertFalse(config.isModemMode)
     }
 
     func testSaveAndLoadURLs() {
@@ -43,6 +48,18 @@ final class ConfigurationTests: XCTestCase {
         XCTAssertEqual(loaded.fileURLs, ["https://example.com/art.ans"])
         XCTAssertEqual(loaded.transitionMode, 2)
         XCTAssertEqual(loaded.scrollSpeed, 100.0)
+    }
+
+    func testSaveAndLoadModemSettings() {
+        var config = Configuration.load()
+        config.displayMode = 1
+        config.modemSpeed = 9600
+        config.save()
+
+        let loaded = Configuration.load()
+        XCTAssertEqual(loaded.displayMode, 1)
+        XCTAssertEqual(loaded.modemSpeed, 9600)
+        XCTAssertTrue(loaded.isModemMode)
     }
 
     func testBookmarkCreation() {

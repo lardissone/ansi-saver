@@ -10,12 +10,20 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
 
     private var packTable: NSTableView!
     private var folderPathControl: NSPathControl!
+    private var displayModePopup: NSPopUpButton!
     private var transitionPopup: NSPopUpButton!
     private var speedSlider: NSSlider!
-    private var speedLabel: NSTextField!
+    private var speedValueLabel: NSTextField!
     private var scalePopup: NSPopUpButton!
     private var continuousCheck: NSButton!
     private var separatorCheck: NSButton!
+    private var modemPopup: NSPopUpButton!
+
+    private var modernViews: [NSView] = []
+    private var modemViews: [NSView] = []
+
+    private static let modemSpeeds = [300, 1200, 2400, 9600, 14400, 28800, 33600, 56000]
+    private static let modemLabels = ["300", "1200", "2400", "9600", "14.4k", "28.8k", "33.6k", "56k"]
 
     init(config: Configuration) {
         self.config = config
@@ -37,18 +45,22 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         } else {
             folderPathControl.url = nil
         }
+        displayModePopup.selectItem(at: newConfig.displayMode)
         transitionPopup.selectItem(at: newConfig.transitionMode)
         speedSlider.doubleValue = newConfig.scrollSpeed
-        speedLabel.stringValue = "\(Int(newConfig.scrollSpeed)) px/s"
-        scalePopup.selectItem(at: newConfig.scaleFactor - 1)
+        speedValueLabel.stringValue = "\(Int(newConfig.scrollSpeed)) px/s"
+        scalePopup.selectItem(at: max(newConfig.scaleFactor - 1, 0))
         continuousCheck.state = newConfig.continuousScroll ? .on : .off
         separatorCheck.state = newConfig.showSeparator ? .on : .off
         separatorCheck.isEnabled = newConfig.continuousScroll
+        let modemIndex = Self.modemSpeeds.firstIndex(of: newConfig.modemSpeed) ?? 2
+        modemPopup.selectItem(at: modemIndex)
+        updateDisplayMode()
     }
 
     private func buildWindow() {
         window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 520, height: 480),
+            contentRect: NSRect(x: 0, y: 0, width: 520, height: 520),
             styleMask: [.titled],
             backing: .buffered,
             defer: true
@@ -59,7 +71,10 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         contentView.autoresizingMask = [.width, .height]
         window.contentView = contentView
 
-        var y: CGFloat = 440
+        modernViews = []
+        modemViews = []
+
+        var y: CGFloat = 480
 
         // Pack URLs section
         y = addLabel("16colo.rs Pack URLs:", to: contentView, y: y)
@@ -84,50 +99,99 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         contentView.addSubview(browseButton)
         y -= 40
 
-        // Transition mode
-        y = addLabel("Transition:", to: contentView, y: y)
-        transitionPopup = NSPopUpButton(frame: NSRect(x: 120, y: y + 2, width: 180, height: 24))
-        transitionPopup.addItems(withTitles: ["Scroll Up", "Scroll Down", "Crossfade"])
-        transitionPopup.selectItem(at: config.transitionMode)
-        contentView.addSubview(transitionPopup)
-        y -= 14
-
-        // Speed slider
-        y = addLabel("Scroll Speed:", to: contentView, y: y)
-        speedSlider = NSSlider(frame: NSRect(x: 120, y: y + 4, width: 280, height: 20))
-        speedSlider.minValue = 10
-        speedSlider.maxValue = 200
-        speedSlider.doubleValue = config.scrollSpeed
-        speedSlider.target = self
-        speedSlider.action = #selector(speedChanged)
-        contentView.addSubview(speedSlider)
-
-        speedLabel = NSTextField(labelWithString: "\(Int(config.scrollSpeed)) px/s")
-        speedLabel.frame = NSRect(x: 410, y: y + 2, width: 80, height: 20)
-        contentView.addSubview(speedLabel)
-        y -= 20
-
-        // Scale factor
+        // Render scale (applies to both modes)
         y = addLabel("Render Scale:", to: contentView, y: y)
         scalePopup = NSPopUpButton(frame: NSRect(x: 120, y: y + 2, width: 180, height: 24))
         scalePopup.addItems(withTitles: ["1x", "2x", "3x", "4x"])
-        scalePopup.selectItem(at: config.scaleFactor - 1)
+        scalePopup.selectItem(at: max(config.scaleFactor - 1, 0))
         contentView.addSubview(scalePopup)
         y -= 14
 
-        // Continuous scroll
-        continuousCheck = NSButton(checkboxWithTitle: "Continuous scroll", target: self, action: #selector(continuousChanged))
-        continuousCheck.frame = NSRect(x: 20, y: y - 20, width: 200, height: 18)
-        continuousCheck.state = config.continuousScroll ? .on : .off
-        contentView.addSubview(continuousCheck)
-        y -= 24
+        // Display mode toggle
+        y = addLabel("Display Mode:", to: contentView, y: y)
+        displayModePopup = NSPopUpButton(frame: NSRect(x: 120, y: y + 2, width: 180, height: 24))
+        displayModePopup.addItems(withTitles: ["Modern", "Modem"])
+        displayModePopup.selectItem(at: config.displayMode)
+        displayModePopup.target = self
+        displayModePopup.action = #selector(displayModeChanged)
+        contentView.addSubview(displayModePopup)
+        y -= 14
 
-        separatorCheck = NSButton(checkboxWithTitle: "Show separator between files", target: nil, action: nil)
-        separatorCheck.frame = NSRect(x: 40, y: y - 20, width: 240, height: 18)
-        separatorCheck.state = config.showSeparator ? .on : .off
-        separatorCheck.isEnabled = config.continuousScroll
-        contentView.addSubview(separatorCheck)
-        y -= 28
+        // ---- Mode-specific controls occupy the same vertical region ----
+        let modeStartY = y
+
+        // Modern controls
+        do {
+            var my = modeStartY
+
+            let transLabel = makeFieldLabel("Transition:", at: my, in: contentView)
+            modernViews.append(transLabel)
+            my -= 22
+
+            transitionPopup = NSPopUpButton(frame: NSRect(x: 120, y: my + 2, width: 180, height: 24))
+            transitionPopup.addItems(withTitles: ["Scroll Up", "Scroll Down", "Crossfade"])
+            transitionPopup.selectItem(at: config.transitionMode)
+            contentView.addSubview(transitionPopup)
+            modernViews.append(transitionPopup)
+            my -= 14
+
+            let speedLabel = makeFieldLabel("Scroll Speed:", at: my, in: contentView)
+            modernViews.append(speedLabel)
+            my -= 22
+
+            speedSlider = NSSlider(frame: NSRect(x: 120, y: my + 4, width: 280, height: 20))
+            speedSlider.minValue = 10
+            speedSlider.maxValue = 200
+            speedSlider.doubleValue = config.scrollSpeed
+            speedSlider.target = self
+            speedSlider.action = #selector(speedChanged)
+            contentView.addSubview(speedSlider)
+            modernViews.append(speedSlider)
+
+            speedValueLabel = NSTextField(labelWithString: "\(Int(config.scrollSpeed)) px/s")
+            speedValueLabel.frame = NSRect(x: 410, y: my + 2, width: 80, height: 20)
+            contentView.addSubview(speedValueLabel)
+            modernViews.append(speedValueLabel)
+            my -= 20
+
+            continuousCheck = NSButton(checkboxWithTitle: "Continuous scroll", target: self, action: #selector(continuousChanged))
+            continuousCheck.frame = NSRect(x: 20, y: my - 20, width: 200, height: 18)
+            continuousCheck.state = config.continuousScroll ? .on : .off
+            contentView.addSubview(continuousCheck)
+            modernViews.append(continuousCheck)
+            my -= 24
+
+            separatorCheck = NSButton(checkboxWithTitle: "Show separator between files", target: nil, action: nil)
+            separatorCheck.frame = NSRect(x: 40, y: my - 20, width: 240, height: 18)
+            separatorCheck.state = config.showSeparator ? .on : .off
+            separatorCheck.isEnabled = config.continuousScroll
+            contentView.addSubview(separatorCheck)
+            modernViews.append(separatorCheck)
+            my -= 28
+
+            // Use the bottom of the modern section as the continuation point
+            y = my
+        }
+
+        // Modem controls (placed at same start position)
+        do {
+            var my = modeStartY
+
+            let baudLabel = makeFieldLabel("Baud Rate:", at: my, in: contentView)
+            modemViews.append(baudLabel)
+            my -= 22
+
+            modemPopup = NSPopUpButton(frame: NSRect(x: 120, y: my + 2, width: 180, height: 24))
+            modemPopup.addItems(withTitles: Self.modemLabels)
+            let modemIndex = Self.modemSpeeds.firstIndex(of: config.modemSpeed) ?? 2
+            modemPopup.selectItem(at: modemIndex)
+            contentView.addSubview(modemPopup)
+            modemViews.append(modemPopup)
+        }
+
+        updateDisplayMode()
+
+        // ---- End mode-specific region ----
 
         // Refetch button
         let refetchButton = NSButton(title: "Refetch Packs", target: self, action: #selector(refetchPacks))
@@ -144,6 +208,14 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         cancelButton.frame = NSRect(x: 310, y: 10, width: 90, height: 28)
         cancelButton.keyEquivalent = "\u{1b}"
         contentView.addSubview(cancelButton)
+    }
+
+    private func makeFieldLabel(_ text: String, at y: CGFloat, in view: NSView) -> NSTextField {
+        let label = NSTextField(labelWithString: text)
+        label.font = .boldSystemFont(ofSize: 12)
+        label.frame = NSRect(x: 20, y: y - 18, width: 100, height: 18)
+        view.addSubview(label)
+        return label
     }
 
     @discardableResult
@@ -237,11 +309,21 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
     }
 
     @objc private func speedChanged() {
-        speedLabel.stringValue = "\(Int(speedSlider.doubleValue)) px/s"
+        speedValueLabel.stringValue = "\(Int(speedSlider.doubleValue)) px/s"
     }
 
     @objc private func continuousChanged() {
         separatorCheck.isEnabled = continuousCheck.state == .on
+    }
+
+    @objc private func displayModeChanged() {
+        updateDisplayMode()
+    }
+
+    private func updateDisplayMode() {
+        let isModem = displayModePopup.indexOfSelectedItem == 1
+        for view in modernViews { view.isHidden = isModem }
+        for view in modemViews { view.isHidden = !isModem }
     }
 
     @objc private func refetchPacks() {
@@ -260,6 +342,8 @@ class ConfigSheet: NSObject, NSTableViewDataSource, NSTableViewDelegate {
         config.scaleFactor = scalePopup.indexOfSelectedItem + 1
         config.continuousScroll = continuousCheck.state == .on
         config.showSeparator = separatorCheck.state == .on
+        config.displayMode = displayModePopup.indexOfSelectedItem
+        config.modemSpeed = Self.modemSpeeds[modemPopup.indexOfSelectedItem]
         config.save()
 
         dismissSheet()

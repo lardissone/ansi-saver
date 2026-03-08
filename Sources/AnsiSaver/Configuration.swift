@@ -14,6 +14,8 @@ struct Configuration {
         static let scaleFactor = "scaleFactor"
         static let continuousScroll = "continuousScroll"
         static let showSeparator = "showSeparator"
+        static let displayMode = "displayMode"
+        static let modemSpeed = "modemSpeed"
     }
 
     var packURLs: [String]
@@ -24,6 +26,10 @@ struct Configuration {
     var scaleFactor: Int
     var continuousScroll: Bool
     var showSeparator: Bool
+    var displayMode: Int
+    var modemSpeed: Int
+
+    var isModemMode: Bool { displayMode == 1 }
 
     var localFolderPath: String? {
         guard let bookmark = localFolderBookmark else { return nil }
@@ -53,7 +59,11 @@ struct Configuration {
             continuousScroll: defaults.bool(forKey: Key.continuousScroll),
             showSeparator: defaults.object(forKey: Key.showSeparator) != nil
                 ? defaults.bool(forKey: Key.showSeparator)
-                : true
+                : true,
+            displayMode: defaults.integer(forKey: Key.displayMode),
+            modemSpeed: defaults.object(forKey: Key.modemSpeed) != nil
+                ? defaults.integer(forKey: Key.modemSpeed)
+                : 2400
         )
         Self.debugLog("Config.load() process=\(ProcessInfo.processInfo.processName) bookmark=\(config.localFolderBookmark?.count ?? 0) bytes, packs=\(config.packURLs.count), files=\(config.fileURLs.count), folderPath=\(config.localFolderPath ?? "nil")")
         return config
@@ -69,6 +79,8 @@ struct Configuration {
         defaults.set(scaleFactor, forKey: Key.scaleFactor)
         defaults.set(continuousScroll, forKey: Key.continuousScroll)
         defaults.set(showSeparator, forKey: Key.showSeparator)
+        defaults.set(displayMode, forKey: Key.displayMode)
+        defaults.set(modemSpeed, forKey: Key.modemSpeed)
         let ok = defaults.synchronize()
         Self.debugLog("Config.save() process=\(ProcessInfo.processInfo.processName) sync=\(ok) bookmark=\(localFolderBookmark?.count ?? 0) bytes, packs=\(packURLs.count)")
     }

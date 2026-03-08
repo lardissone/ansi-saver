@@ -98,7 +98,9 @@ class AnsiSaverView: ScreenSaverView {
             self.artPaths = allPaths.shuffled()
             Configuration.debugLog("loadArt: found \(allPaths.count) files, first: \(allPaths.first ?? "none")")
 
-            if self.config.continuousScroll {
+            if self.config.isModemMode {
+                self.startModemMode()
+            } else if self.config.continuousScroll {
                 self.startContinuousMode()
             } else {
                 self.showNextArt()
@@ -113,9 +115,23 @@ class AnsiSaverView: ScreenSaverView {
         let path = nextArtPath()
         let transition = TransitionMode(rawValue: config.transitionMode) ?? .scrollUp
 
+        let useModem = self.config.isModemMode
+
         DispatchQueue.global(qos: .userInitiated).async { [weak self] in
             guard let self = self else { return }
-            guard let image = Renderer.render(ansFileAt: path, scaleFactor: self.config.scaleFactor <= 1 ? 0 : UInt8(self.config.scaleFactor)) else {
+            let sf: UInt8 = self.config.scaleFactor <= 1 ? 0 : UInt8(self.config.scaleFactor)
+
+            let renderResult: RenderResult?
+            let image: NSImage?
+            if useModem {
+                renderResult = Renderer.renderWithInfo(ansFileAt: path, scaleFactor: sf)
+                image = renderResult?.image
+            } else {
+                renderResult = nil
+                image = Renderer.render(ansFileAt: path, scaleFactor: sf)
+            }
+
+            guard let image = image else {
                 DispatchQueue.main.async {
                     self.consecutiveFailures += 1
                     if self.consecutiveFailures < self.maxConsecutiveFailures {
@@ -127,9 +143,28 @@ class AnsiSaverView: ScreenSaverView {
                 return
             }
 
+            // For modem mode, compute content columns per row on background thread
+            let modemInfo: (columns: Int, rows: Int, contentCols: [Int])?
+            if useModem, let result = renderResult {
+                let effectiveScale = max(Int(sf), 1)
+                let columns = result.pixelWidth / (8 * effectiveScale)
+                let rows = result.pixelHeight / (16 * effectiveScale)
+                let contentCols = Renderer.contentColumnsPerRow(for: result, columns: columns, rows: rows)
+                modemInfo = (columns, rows, contentCols)
+            } else {
+                modemInfo = nil
+            }
+
             DispatchQueue.main.async {
                 self.consecutiveFailures = 0
-                if self.config.continuousScroll {
+                if useModem, let info = modemInfo {
+                    self.animator?.appendModemArt(
+                        image: image,
+                        columns: info.columns,
+                        rows: info.rows,
+                        contentColumnsPerRow: info.contentCols
+                    )
+                } else if self.config.continuousScroll {
                     let fileName = (path as NSString).lastPathComponent
                     self.animator?.appendArt(image: image, fileName: fileName, showSeparator: self.config.showSeparator)
                 } else {
@@ -173,6 +208,46 @@ class AnsiSaverView: ScreenSaverView {
                     speed: self.config.scrollSpeed,
                     viewSize: self.bounds.size,
                     showSeparator: self.config.showSeparator
+                )
+            }
+        }
+    }
+
+    private func startModemMode() {
+        guard !artPaths.isEmpty else { return }
+        guard bounds.size.width > 0, bounds.size.height > 0 else { return }
+
+        let path = nextArtPath()
+
+        DispatchQueue.global(qos: .userInitiated).async { [weak self] in
+            guard let self = self else { return }
+            let sf: UInt8 = self.config.scaleFactor <= 1 ? 0 : UInt8(self.config.scaleFactor)
+            guard let result = Renderer.renderWithInfo(ansFileAt: path, scaleFactor: sf) else {
+                DispatchQueue.main.async {
+                    self.consecutiveFailures += 1
+                    if self.consecutiveFailures < self.maxConsecutiveFailures {
+                        self.startModemMode()
+                    } else {
+                        self.showMessage("Unable to render art files.")
+                    }
+                }
+                return
+            }
+
+            let effectiveScale = max(Int(sf), 1)
+            let columns = result.pixelWidth / (8 * effectiveScale)
+            let rows = result.pixelHeight / (16 * effectiveScale)
+            let contentCols = Renderer.contentColumnsPerRow(for: result, columns: columns, rows: rows)
+
+            DispatchQueue.main.async {
+                self.consecutiveFailures = 0
+                self.animator?.startModemContinuous(
+                    firstImage: result.image,
+                    columns: columns,
+                    rows: rows,
+                    contentColumnsPerRow: contentCols,
+                    modemSpeed: self.config.modemSpeed,
+                    viewSize: self.bounds.size
                 )
             }
         }
