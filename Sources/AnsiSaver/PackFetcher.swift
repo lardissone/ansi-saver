@@ -49,6 +49,11 @@ enum PackFetcher {
                 return
             }
 
+            guard AnsiContentValidator.isLikelyAnsiArt(data: data, fileName: filename) else {
+                completion(false)
+                return
+            }
+
             Cache.write(data, to: localPath)
             completion(true)
         }

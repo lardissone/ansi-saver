@@ -26,7 +26,12 @@ class FolderSource: ArtSource {
                 let ext = (name as NSString).pathExtension.lowercased()
                 return ansiExtensions.contains(ext)
             }
-            .map { (folderPath as NSString).appendingPathComponent($0) }
+            .compactMap { name -> String? in
+                let path = (folderPath as NSString).appendingPathComponent(name)
+                guard let data = Cache.read(path) else { return nil }
+                guard AnsiContentValidator.isLikelyAnsiArt(data: data, fileName: name) else { return nil }
+                return path
+            }
 
         completion(paths)
     }
@@ -57,8 +62,15 @@ class PackSource: ArtSource {
                 let localPath = Cache.ansPath(forPack: packName, file: filename)
 
                 if Cache.exists(localPath) {
-                    queue.sync { localPaths.append(localPath) }
-                    continue
+                    if let data = Cache.read(localPath),
+                       AnsiContentValidator.isLikelyAnsiArt(data: data, fileName: filename) {
+                        queue.sync { localPaths.append(localPath) }
+                    } else {
+                        try? FileManager.default.removeItem(atPath: localPath)
+                    }
+                    if Cache.exists(localPath) {
+                        continue
+                    }
                 }
 
                 group.enter()
@@ -97,17 +109,26 @@ class URLSource: ArtSource {
 
         for urlString in fileURLs {
             let localPath = Cache.urlCachePath(for: urlString)
+            let remoteName = URL(string: urlString)?.lastPathComponent ?? "download.ans"
 
             if Cache.exists(localPath) {
-                queue.sync { localPaths.append(localPath) }
-                continue
+                if let data = Cache.read(localPath),
+                   AnsiContentValidator.isLikelyAnsiArt(data: data, fileName: remoteName) {
+                    queue.sync { localPaths.append(localPath) }
+                } else {
+                    try? FileManager.default.removeItem(atPath: localPath)
+                }
+                if Cache.exists(localPath) {
+                    continue
+                }
             }
 
             guard let url = URL(string: urlString) else { continue }
 
             group.enter()
             let task = URLSession.shared.dataTask(with: url) { data, _, error in
-                if let data = data, error == nil {
+                if let data = data, error == nil,
+                   AnsiContentValidator.isLikelyAnsiArt(data: data, fileName: remoteName) {
                     Cache.write(data, to: localPath)
                     queue.sync { localPaths.append(localPath) }
                 }
