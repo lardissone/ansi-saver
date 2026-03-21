@@ -15,6 +15,7 @@
 		A1000006 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* Animator.swift */; };
 		A1000007 /* PackFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* PackFetcher.swift */; };
 		A1000008 /* ConfigSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* ConfigSheet.swift */; };
+		A1000009 /* AnsiContentValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* AnsiContentValidator.swift */; };
 		A1000101 /* clean.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000101 /* clean.c */; };
 		A1000102 /* drawchar.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000102 /* drawchar.c */; };
 		A1000103 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000103 /* error.c */; };
@@ -35,6 +36,7 @@
 		B1000002 /* PackFetcherTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000002 /* PackFetcherTests.swift */; };
 		B1000003 /* CacheTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000003 /* CacheTests.swift */; };
 		B1000004 /* ConfigurationTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000004 /* ConfigurationTests.swift */; };
+		B1000005 /* AnsiContentValidatorTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2000006 /* AnsiContentValidatorTests.swift */; };
 		B1100001 /* AnsiSaverView.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000001 /* AnsiSaverView.swift */; };
 		B1100002 /* Renderer.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000002 /* Renderer.swift */; };
 		B1100003 /* Configuration.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000003 /* Configuration.swift */; };
@@ -43,6 +45,7 @@
 		B1100006 /* Animator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000006 /* Animator.swift */; };
 		B1100007 /* PackFetcher.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000007 /* PackFetcher.swift */; };
 		B1100008 /* ConfigSheet.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000008 /* ConfigSheet.swift */; };
+		B1100009 /* AnsiContentValidator.swift in Sources */ = {isa = PBXBuildFile; fileRef = A2000009 /* AnsiContentValidator.swift */; };
 		B1100101 /* clean.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000101 /* clean.c */; };
 		B1100102 /* drawchar.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000102 /* drawchar.c */; };
 		B1100103 /* error.c in Sources */ = {isa = PBXBuildFile; fileRef = A2000103 /* error.c */; };
@@ -70,6 +73,7 @@
 		A2000006 /* Animator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Animator.swift; sourceTree = "<group>"; };
 		A2000007 /* PackFetcher.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackFetcher.swift; sourceTree = "<group>"; };
 		A2000008 /* ConfigSheet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigSheet.swift; sourceTree = "<group>"; };
+		A2000009 /* AnsiContentValidator.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnsiContentValidator.swift; sourceTree = "<group>"; };
 		A2000010 /* AnsiSaver.saver */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnsiSaver.saver; sourceTree = BUILT_PRODUCTS_DIR; };
 		A2000011 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		A2000012 /* AnsiSaver-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "AnsiSaver-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -101,6 +105,7 @@
 		B2000002 /* PackFetcherTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PackFetcherTests.swift; sourceTree = "<group>"; };
 		B2000003 /* CacheTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheTests.swift; sourceTree = "<group>"; };
 		B2000004 /* ConfigurationTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConfigurationTests.swift; sourceTree = "<group>"; };
+		B2000006 /* AnsiContentValidatorTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AnsiContentValidatorTests.swift; sourceTree = "<group>"; };
 		B2000005 /* sample.ans */ = {isa = PBXFileReference; lastKnownFileType = file; path = sample.ans; sourceTree = "<group>"; };
 		B2000010 /* AnsiSaverTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = AnsiSaverTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
@@ -154,6 +159,7 @@
 				A2000006 /* Animator.swift */,
 				A2000007 /* PackFetcher.swift */,
 				A2000008 /* ConfigSheet.swift */,
+				A2000009 /* AnsiContentValidator.swift */,
 			);
 			path = AnsiSaver;
 			sourceTree = "<group>";
@@ -173,6 +179,7 @@
 				B2000002 /* PackFetcherTests.swift */,
 				B2000003 /* CacheTests.swift */,
 				B2000004 /* ConfigurationTests.swift */,
+				B2000006 /* AnsiContentValidatorTests.swift */,
 				B4000003 /* Fixtures */,
 			);
 			path = AnsiSaverTests;
@@ -353,6 +360,7 @@
 				A1000006 /* Animator.swift in Sources */,
 				A1000007 /* PackFetcher.swift in Sources */,
 				A1000008 /* ConfigSheet.swift in Sources */,
+				A1000009 /* AnsiContentValidator.swift in Sources */,
 				A1000101 /* clean.c in Sources */,
 				A1000102 /* drawchar.c in Sources */,
 				A1000103 /* error.c in Sources */,
@@ -380,6 +388,7 @@
 				B1000002 /* PackFetcherTests.swift in Sources */,
 				B1000003 /* CacheTests.swift in Sources */,
 				B1000004 /* ConfigurationTests.swift in Sources */,
+				B1000005 /* AnsiContentValidatorTests.swift in Sources */,
 				B1100001 /* AnsiSaverView.swift in Sources */,
 				B1100002 /* Renderer.swift in Sources */,
 				B1100003 /* Configuration.swift in Sources */,
@@ -388,6 +397,7 @@
 				B1100006 /* Animator.swift in Sources */,
 				B1100007 /* PackFetcher.swift in Sources */,
 				B1100008 /* ConfigSheet.swift in Sources */,
+				B1100009 /* AnsiContentValidator.swift in Sources */,
 				B1100101 /* clean.c in Sources */,
 				B1100102 /* drawchar.c in Sources */,
 				B1100103 /* error.c in Sources */,
